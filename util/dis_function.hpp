@@ -9,7 +9,7 @@
 #include <cstdlib>
 #include <vector>
 
-double coe = 0;
+double coe = 0.03;
 double INF = 1e10;
 template <typename Type>
 void get_nearest_md(vector<Type>& tra,vector<Type>& sub,int& beg,int& end)
@@ -72,7 +72,7 @@ void get_nearest_md(vector<Type>& tra,vector<Type>& sub,int& beg,int& end)
 
 
         be = dpA[i][j - 1]+dis(sub[i],tra[j])*coe;
-        af = dpB[i][j - 1]+dis(tra[j],tra[j - 1]);//coe2
+        af = dpB[i][j - 1]+dis(tra[j],tra[j - 1])*coe;//coe2
         if(be<=af)
         {
             dpB[i][j] = be;
@@ -193,6 +193,17 @@ double getdistance_dtw(vector<Type>& one, vector<Type>& two)
             dp[i][j] = dis(one[i], two[j]) + min(dp[i - 1][j], min(dp[i][j - 1], dp[i - 1][j - 1]));
         }
     return dp[n - 1][m - 1];
+}
+
+template <typename Type>
+double getdistance_ed(vector<Type>& one, vector<Type>& two){
+    int n = min(one.size(),two.size());
+    double ans = 0;
+    for(int i = 0;i < n; ++i)
+    {
+        ans += dis(one[i],two[i]);
+    }
+    return ans;
 }
 
 #endif

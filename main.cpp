@@ -54,13 +54,13 @@ double dis(const point& p1,const point& p2)
 vector< vector< vector<point> > >series;
 string names[40];
 map<string,int> maps;
-const int num_all = 2858;
+const int num_all = 500;
 int center[100];
 
 
 extern double INF;
 
-extern double coe;
+//extern double coe = 0.03;
 
 double down_ratio = 0.2;
 
@@ -123,8 +123,12 @@ void readFile()
             now.push_back(point(datax,datay,dataf));
             }
         }
-        cout << now.size() << " ";
+        //cout << now.size() << " ";
         series[vec_label[i]].push_back(now);
+    }
+    while(series[series.size() - 1].size() == 0)
+    {
+        series.pop_back();
     }
 }
 
@@ -138,7 +142,7 @@ void getcenter()
             double sum_dist = 0;
             for(int k = 0;k < series[i].size();k++)
             {
-                sum_dist += getdistance_dtw(series[i][j],series[i][k]);
+                sum_dist += getdistance_ed(series[i][j],series[i][k]);
             }
             if(sum_dist < min_dist)
             {
@@ -178,6 +182,7 @@ void get_sentences()
             int nu = rand()%series[cla].size();
             sen.insert(sen.end(),series[cla][nu].begin(),series[cla][nu].end());
         }
+        
     }
     cout << "success" << endl;
 }
@@ -195,7 +200,7 @@ void compute_accuracy(double& recall,double& accuracy,void (*get_distance)(vecto
         for (int j = 0;j < series[i].size(); j++)
         {
             int beg = 0 ,end = 0;
-            add_noise(series[i][j],down_ratio,0);
+            //add_noise(series[i][j],down_ratio,0);
             get_distance(sentences[i].sen, series[i][j], beg, end);
             
             int beg_real = sentences[i].begin;
@@ -213,6 +218,12 @@ void compute_accuracy(double& recall,double& accuracy,void (*get_distance)(vecto
     recall /= double(series.size());
     accuracy /= double(series.size());
 }
+void add_noise_pro()
+{
+     for(int i = 0;i < series.size();i++)
+        for (int j = 0;j < series[i].size(); j++)
+            add_noise(series[i][j],down_ratio,0);
+}
 int main()//*******************************************************************************************************
 {
     readFile();
@@ -221,18 +232,19 @@ int main()//********************************************************************
     cout << "getcenter" << endl;
     get_sentences();
     cout << "getsentences" << endl;
-
+    
+    add_noise_pro();
 
 
     double recall;
     double accuracy;
-    compute_accuracy(recall,accuracy,get_nearest_dtw);
+    compute_accuracy(recall,accuracy,get_nearest_md);
     cout<< "-----------------------------------------------------" << endl;
     cout << "md recall:   " << recall <<endl;
     cout << "md accuracy: " << accuracy <<endl;
     cout << "md mean:     " << 2 * recall * accuracy / (recall + accuracy) << endl << endl;
 
-    compute_accuracy(recall,accuracy,get_nearest_ed);
+    compute_accuracy(recall,accuracy,get_nearest_dtw);
     cout << "dtw recall:   " << recall <<endl;
     cout << "dtw accuracy: " << accuracy <<endl;
     cout << "dtw mean:     " << 2 * recall * accuracy / (recall + accuracy) << endl << endl;
